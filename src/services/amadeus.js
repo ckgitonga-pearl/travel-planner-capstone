@@ -30,3 +30,27 @@ export const getAccessToken = async () => {
     throw error;
   }
 };
+// Search Cities
+export const searchCities = async (keyword) => {
+  try {
+    const token = await getAccessToken();
+
+    const response = await axios.get(
+      "https://test.api.amadeus.com/v1/reference-data/locations/cities",
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        params: {
+          keyword: keyword,
+        },
+      }
+    );
+
+    return response.data.data;
+  } catch (error) {
+    console.error("City Search Error:", error.response?.data || error.message);
+    throw error;
+  }
+
+};

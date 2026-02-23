@@ -1,23 +1,35 @@
-import { useEffect } from "react";
-import { getAccessToken } from "./services/amadeus";
+import SearchBar from "./components/SearchBar";
+import DestinationCard from "./components/DestinationCard";
+import { useState } from "react";
+import { searchCities } from "./services/amadeus";
 
 function Home() {
-  useEffect(() => {
-    const authenticate = async () => {
-      try {
-        const token = await getAccessToken();
-        console.log("ACCESS TOKEN:", token);
-      } catch (error) {
-        console.log("Auth failed");
-      }
-    };
+  const [cities, setCities] = useState([]);
+  const [error, setError] = useState(null);
 
-    authenticate();
-  }, []);
+  const handleSearch = async (keyword) => {
+    try {
+      const results = await searchCities(keyword);
+      setCities(results);
+      setError(null);
+    } catch (err) {
+      setError("Failed to fetch cities.");
+    }
+  };
 
   return (
-    <div>
-      <h1>Travel Planner</h1>
+    <div className="p-8">
+      <h1 className="text-3xl font-bold mb-6">Travel Planner</h1>
+
+      <SearchBar onSearch={handleSearch} />
+
+      {error && <p className="text-red-500">{error}</p>}
+
+      <div className="space-y-4">
+        {cities.map((city) => (
+          <DestinationCard key={city.id} city={city} />
+        ))}
+      </div>
     </div>
   );
 }
