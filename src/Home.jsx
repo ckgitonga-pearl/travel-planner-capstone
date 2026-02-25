@@ -1,35 +1,38 @@
 import SearchBar from "./components/SearchBar";
 import DestinationCard from "./components/DestinationCard";
+import ItineraryPlanner from "./components/ItineraryPlanner";
 import { useState } from "react";
 import { searchCities } from "./services/amadeus";
 import { useFavoriteStore } from "./store/favoriteStore";
-
+import { useItineraryStore } from "./store/itineraryStore";
 function Home() {
   const [cities, setCities] = useState([]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [selectedCity, setSelectedCity] = useState(null);
+  const { itineraries, selectedCity,setSelectedCity,addDay,addActivity, removeActivity 
+  } = useItineraryStore();
   const [hasSearched, setHasSearched] = useState(false);
 
-  const { favorites, addFavorite, removeFavorite } = useFavoriteStore();
+  const { favorites, addFavorite, removeFavorite } =
+    useFavoriteStore();
 
   const handleSearch = async (keyword) => {
     try {
       setLoading(true);
       setError(null);
-      setSelectedCity(null);
       setHasSearched(true);
 
       const results = await searchCities(keyword);
 
-      // Remove duplicates safely
       const uniqueResults = (results || []).filter(
         (city, index, self) =>
           index ===
           self.findIndex(
             (c) =>
-              (c.id || c.name + c.address?.countryCode) ===
-              (city.id || city.name + city.address?.countryCode)
+              (c.id ||
+                c.name + c.address?.countryCode) ===
+              (city.id ||
+                city.name + city.address?.countryCode)
           )
       );
 
@@ -54,20 +57,26 @@ function Home() {
           Travel Planner
         </h1>
 
-        {/* Search */}
         <SearchBar onSearch={handleSearch} />
 
         {loading && (
-          <p className="text-blue-600">Searching destinations...</p>
+          <p className="text-blue-600">
+            Searching destinations...
+          </p>
         )}
 
         {error && (
           <p className="text-red-500">{error}</p>
         )}
 
-        {hasSearched && !loading && cities.length === 0 && !error && (
-          <p className="text-gray-500">No destinations found.</p>
-        )}
+        {hasSearched &&
+          !loading &&
+          cities.length === 0 &&
+          !error && (
+            <p className="text-gray-500">
+              No destinations found.
+            </p>
+          )}
 
         {/* Search Results */}
         <div className="space-y-4">
@@ -101,51 +110,55 @@ function Home() {
 
             <button
               onClick={() => addFavorite(selectedCity)}
-              className="mt-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+              className="mt-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
             >
               Save to Favorites
             </button>
           </div>
         )}
 
-        {/* Favorite Destinations */}
-{favorites.length > 0 && (
-  <div className="bg-white rounded-xl shadow-md p-6">
-    <h2 className="text-2xl font-bold text-blue-700 mb-6">
-      Favorite Destinations
-    </h2>
+        {/* Itinerary Planner */}
+        {selectedCity && (
+          <ItineraryPlanner city={selectedCity} />
+        )}
 
-    <div className="space-y-4">
-      {favorites.map((city, index) => (
-        <div
-          key={
-            city.id ||
-            `${city.name}-${city.address?.countryCode}-${index}`
-          }
-          className="flex items-center justify-between border-b pb-4"
-        >
-          {/* LEFT SIDE */}
-          <div>
-            <p className="font-semibold text-lg">
-              {city.name} ({city.address?.countryCode || "N/A"})
-            </p>
-            <p className="text-sm text-gray-600">
-              IATA: {city.iataCode || "N/A"}
-            </p>
+        {/* Favorites */}
+        {favorites.length > 0 && (
+          <div className="bg-white rounded-xl shadow-md p-6">
+            <h2 className="text-2xl font-bold text-blue-700 mb-6">
+              Favorite Destinations
+            </h2>
+
+            <div className="space-y-4">
+              {favorites.map((city, index) => (
+                <div
+                  key={
+                    city.id ||
+                    `${city.name}-${city.address?.countryCode}-${index}`
+                  }
+                  className="flex justify-between items-center border-b pb-4"
+                >
+                  <div>
+                    <p className="font-semibold text-lg">
+                      {city.name} (
+                      {city.address?.countryCode || "N/A"})
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      IATA: {city.iataCode || "N/A"}
+                    </p>
+                  </div>
+
+                  <button
+                    onClick={() => removeFavorite(city)}
+                    className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg"
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
-
-          {/* RIGHT SIDE */}
-          <button
-  onClick={() => removeFavorite(city.iataCode)}
-  className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg"
->
-  Remove
-</button>
-        </div>
-      ))}
-    </div>
-  </div>
-)}
+        )}
 
       </div>
     </div>
