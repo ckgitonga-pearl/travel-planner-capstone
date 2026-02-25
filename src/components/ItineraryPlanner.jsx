@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useItineraryStore } from "../store/itineraryStore";
 
 function ItineraryPlanner({ city }) {
-  const [activityInput, setActivityInput] = useState("");
+  
 
   if (!city) return null;
 
@@ -17,6 +17,14 @@ function ItineraryPlanner({ city }) {
   } = useItineraryStore();
 
   const cityPlan = itineraries[cityKey] || [];
+  const [inputs, setInputs] = useState({});
+
+  const handleInputChange = (dayId, value) => {
+    setInputs((prev) => ({
+      ...prev,
+      [dayId]: value,
+    }));
+  };
 
   return (
     <div className="mt-10 p-6 bg-white rounded-xl shadow-md space-y-4">
@@ -37,7 +45,7 @@ function ItineraryPlanner({ city }) {
 
       {cityPlan.map((day, dayIndex) => (
         <div
-          key={dayIndex}
+          key={day.id}
           className="border p-4 rounded-lg mt-4"
         >
           <h3 className="font-semibold">
@@ -47,9 +55,9 @@ function ItineraryPlanner({ city }) {
           <div className="flex gap-2 mt-2">
             <input
               type="text"
-              value={activityInput}
+              value={inputs[day.id] || ""}
               onChange={(e) =>
-                setActivityInput(e.target.value)
+                handleInputChange(day.id, e.target.value)
               }
               placeholder="Add activity"
               className="border p-2 rounded w-full"
@@ -57,14 +65,17 @@ function ItineraryPlanner({ city }) {
 
             <button
               onClick={() => {
-                if (!activityInput.trim()) return;
-                addActivity(
-                  cityKey,
-                  dayIndex,
-                  activityInput
-                );
-                setActivityInput("");
-              }}
+  const activity = inputs[day.id];
+
+  if (!activity || !activity.trim()) return;
+
+  addActivity(cityKey, day.id, activity);
+
+  setInputs((prev) => ({
+    ...prev,
+    [day.id]: "",
+  }));
+}}
               className="bg-blue-600 text-white px-4 rounded"
             >
               Add
@@ -72,9 +83,9 @@ function ItineraryPlanner({ city }) {
           </div>
 
           <ul className="mt-3 space-y-2">
-            {day.activities.map((activity, activityIndex) => (
+            {day.activities.map((activity,index) => (
               <li
-                key={activityIndex}
+                key={index}
                 className="flex justify-between items-center"
               >
                 <span>{activity}</span>
@@ -83,8 +94,8 @@ function ItineraryPlanner({ city }) {
                   onClick={() =>
                     removeActivity(
                       cityKey,
-                      dayIndex,
-                      activityIndex
+                      day.id,
+                      index
                     )
                   }
                   className="text-red-500"

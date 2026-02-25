@@ -5,6 +5,8 @@ import { useState } from "react";
 import { searchCities } from "./services/amadeus";
 import { useFavoriteStore } from "./store/favoriteStore";
 import { useItineraryStore } from "./store/itineraryStore";
+import { Link } from "react-router-dom";
+
 function Home() {
   const [cities, setCities] = useState([]);
   const [error, setError] = useState(null);
@@ -116,6 +118,13 @@ function Home() {
             </button>
           </div>
         )}
+
+        <Link
+  to="/dashboard"
+  className="mt-3 inline-block px-4 py-2 bg-green-600 text-white rounded-lg"
+>
+  View Trip Dashboard
+</Link>
 
         {/* Itinerary Planner */}
         {selectedCity && (

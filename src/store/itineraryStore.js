@@ -1,30 +1,30 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { v4 as uuidv4 } from "uuid";
 
 export const useItineraryStore = create(
   persist(
     (set) => ({
-      itineraries: {},
       selectedCity: null,
+      itineraries: {},
 
       setSelectedCity: (city) =>
-        set(() => ({
-          selectedCity: city,
-        })),
+        set({ selectedCity: city }),
 
       addDay: (cityKey) =>
-        set((state) => ({
-          itineraries: {
-            ...state.itineraries,
-            [cityKey]: [
-              ...(state.itineraries[cityKey] || []),
-              {
-                id: Date.now(),
-                activities: [],
-              },
-            ],
-          },
-        })),
+        set((state) => {
+          const current = state.itineraries[cityKey] || [];
+
+          return {
+            itineraries: {
+              ...state.itineraries,
+              [cityKey]: [
+                ...current,
+                { id: uuidv4(), activities: [] }
+              ]
+            }
+          };
+        }),
 
       addActivity: (cityKey, dayId, activity) =>
         set((state) => ({
@@ -34,14 +34,14 @@ export const useItineraryStore = create(
               day.id === dayId
                 ? {
                     ...day,
-                    activities: [...day.activities, activity],
+                    activities: [...day.activities, activity]
                   }
                 : day
-            ),
-          },
+            )
+          }
         })),
 
-      removeActivity: (cityKey, dayId, activityIndex) =>
+      removeActivity: (cityKey, dayId, index) =>
         set((state) => ({
           itineraries: {
             ...state.itineraries,
@@ -50,16 +50,16 @@ export const useItineraryStore = create(
                 ? {
                     ...day,
                     activities: day.activities.filter(
-                      (_, index) => index !== activityIndex
-                    ),
+                      (_, i) => i !== index
+                    )
                   }
                 : day
-            ),
-          },
-        })),
+            )
+          }
+        }))
     }),
     {
-      name: "itinerary-storage",
+      name: "itinerary-storage"
     }
   )
 );
