@@ -7,6 +7,23 @@ export const useItineraryStore = create(
     (set) => ({
       selectedCity: null,
       itineraries: {},
+      budgets: {},
+      setBudget: (cityKey, amount) =>
+  set((state) => ({
+    budgets: {
+      ...state.budgets,
+      [cityKey]: amount,
+    },
+  })),
+    tripDates: {},
+
+setTripDates: (cityKey, dates) =>
+  set((state) => ({
+    tripDates: {
+      ...state.tripDates,
+      [cityKey]: dates,
+    },
+  })),
 
       setSelectedCity: (city) =>
         set({ selectedCity: city }),
@@ -34,7 +51,10 @@ export const useItineraryStore = create(
               day.id === dayId
                 ? {
                     ...day,
-                    activities: [...day.activities, activity]
+                   activities: [
+                       ...day.activities,
+                    { name: activity.name, cost: activity.cost }
+]
                   }
                 : day
             )
@@ -62,4 +82,5 @@ export const useItineraryStore = create(
       name: "itinerary-storage"
     }
   )
+
 );

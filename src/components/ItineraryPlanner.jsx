@@ -18,6 +18,7 @@ function ItineraryPlanner({ city }) {
 
   const cityPlan = itineraries[cityKey] || [];
   const [inputs, setInputs] = useState({});
+  const [costs, setCosts] = useState({});
 
   const handleInputChange = (dayId, value) => {
     setInputs((prev) => ({
@@ -62,6 +63,18 @@ function ItineraryPlanner({ city }) {
               placeholder="Add activity"
               className="border p-2 rounded w-full"
             />
+             <input
+    type="number"
+    value={costs[day.id] || ""}
+    onChange={(e) =>
+      setCosts((prev) => ({
+        ...prev,
+        [day.id]: e.target.value,
+      }))
+    }
+    placeholder="Cost"
+    className="border p-2 rounded w-24"
+  />
 
             <button
               onClick={() => {
@@ -69,13 +82,21 @@ function ItineraryPlanner({ city }) {
 
   if (!activity || !activity.trim()) return;
 
-  addActivity(cityKey, day.id, activity);
+      addActivity(cityKey, day.id, {
+        name: activity,
+        cost: cost || 0,
+      });
 
-  setInputs((prev) => ({
-    ...prev,
-    [day.id]: "",
-  }));
-}}
+      setInputs((prev) => ({
+        ...prev,
+        [day.id]: "",
+      }));
+
+      setCosts((prev) => ({
+        ...prev,
+        [day.id]: "",
+      }));
+    }}
               className="bg-blue-600 text-white px-4 rounded"
             >
               Add
@@ -88,7 +109,9 @@ function ItineraryPlanner({ city }) {
                 key={index}
                 className="flex justify-between items-center"
               >
-                <span>{activity}</span>
+          <span>
+                     {activity.name} - ${activity.cost}
+           </span>
 
                 <button
                   onClick={() =>
