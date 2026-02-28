@@ -7,13 +7,15 @@ function ItineraryPlanner({ city }) {
   if (!city) return null;
 
   const cityKey =
-    city.id || `${city.name}-${city.address?.countryCode}`;
+  city.id ||
+  `${city.name}-${city.address?.countryCode}`;
 
   const {
     itineraries,
     addDay,
     addActivity,
     removeActivity,
+    removeDay,
   } = useItineraryStore();
 
   const cityPlan = itineraries[cityKey] || [];
@@ -49,9 +51,18 @@ function ItineraryPlanner({ city }) {
           key={day.id}
           className="border p-4 rounded-lg mt-4"
         >
-          <h3 className="font-semibold">
-            Day {dayIndex + 1}
-          </h3>
+          <div className="flex justify-between items-center">
+  <h3 className="font-semibold">
+    Day {dayIndex + 1}
+  </h3>
+
+  <button
+    onClick={() => removeDay(cityKey, day.id)}
+    className="text-red-500 text-sm"
+  >
+    Remove Day
+  </button>
+</div>
 
           <div className="flex gap-2 mt-2">
             <input

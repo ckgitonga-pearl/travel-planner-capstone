@@ -4,83 +4,93 @@ import { v4 as uuidv4 } from "uuid";
 
 export const useItineraryStore = create(
   persist(
-    (set) => ({
+    (set, get) => ({
       selectedCity: null,
       itineraries: {},
       budgets: {},
-      setBudget: (cityKey, amount) =>
-  set((state) => ({
-    budgets: {
-      ...state.budgets,
-      [cityKey]: amount,
-    },
-  })),
-    tripDates: {},
-
-setTripDates: (cityKey, dates) =>
-  set((state) => ({
-    tripDates: {
-      ...state.tripDates,
-      [cityKey]: dates,
-    },
-  })),
+      tripDates: {},
 
       setSelectedCity: (city) =>
         set({ selectedCity: city }),
 
+      setBudget: (cityKey, amount) =>
+        set((state) => ({
+          budgets: {
+            ...state.budgets,
+            [cityKey]: amount,
+          },
+        })),
+
+      setTripDates: (cityKey, dates) =>
+        set((state) => ({
+          tripDates: {
+            ...state.tripDates,
+            [cityKey]: dates,
+          },
+        })),
+
       addDay: (cityKey) =>
         set((state) => {
-          const current = state.itineraries[cityKey] || [];
+          const existing = state.itineraries[cityKey] || [];
 
           return {
             itineraries: {
               ...state.itineraries,
               [cityKey]: [
-                ...current,
-                { id: uuidv4(), activities: [] }
-              ]
-            }
+                ...existing,
+                { id: uuidv4(), activities: [] },
+              ],
+            },
           };
         }),
+
+      removeDay: (cityKey, dayId) =>
+        set((state) => ({
+          itineraries: {
+            ...state.itineraries,
+            [cityKey]:
+              (state.itineraries[cityKey] || []).filter(
+                (day) => day.id !== dayId
+              ),
+          },
+        })),
 
       addActivity: (cityKey, dayId, activity) =>
         set((state) => ({
           itineraries: {
             ...state.itineraries,
-            [cityKey]: state.itineraries[cityKey].map((day) =>
-              day.id === dayId
-                ? {
-                    ...day,
-                   activities: [
-                       ...day.activities,
-                    { name: activity.name, cost: activity.cost }
-]
-                  }
-                : day
-            )
-          }
+            [cityKey]:
+              (state.itineraries[cityKey] || []).map((day) =>
+                day.id === dayId
+                  ? {
+                      ...day,
+                      activities: [...day.activities, activity],
+                    }
+                  : day
+              ),
+          },
         })),
 
       removeActivity: (cityKey, dayId, index) =>
         set((state) => ({
           itineraries: {
             ...state.itineraries,
-            [cityKey]: state.itineraries[cityKey].map((day) =>
-              day.id === dayId
-                ? {
-                    ...day,
-                    activities: day.activities.filter(
-                      (_, i) => i !== index
-                    )
-                  }
-                : day
-            )
-          }
-        }))
+            [cityKey]:
+              (state.itineraries[cityKey] || []).map((day) =>
+                day.id === dayId
+                  ? {
+                      ...day,
+                      activities: day.activities.filter(
+                        (_, i) => i !== index
+                      ),
+                    }
+                  : day
+              ),
+          },
+        })),
     }),
     {
-      name: "itinerary-storage"
+      name: "itinerary-storage",
     }
   )
-
 );
