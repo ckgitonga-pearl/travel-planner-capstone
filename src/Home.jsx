@@ -11,12 +11,10 @@ function Home() {
   const [cities, setCities] = useState([]);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
-  const { itineraries, selectedCity,setSelectedCity,addDay,addActivity, removeActivity 
-  } = useItineraryStore();
   const [hasSearched, setHasSearched] = useState(false);
 
-  const { favorites, addFavorite, removeFavorite } =
-    useFavoriteStore();
+  const { selectedCity, setSelectedCity } = useItineraryStore();
+  const { favorites, addFavorite, removeFavorite } = useFavoriteStore();
 
   const handleSearch = async (keyword) => {
     try {
@@ -31,21 +29,17 @@ function Home() {
           index ===
           self.findIndex(
             (c) =>
-              (c.id ||
-                c.name + c.address?.countryCode) ===
-              (city.id ||
-                city.name + city.address?.countryCode)
+              (c.id || c.name + c.address?.countryCode) ===
+              (city.id || city.name + city.address?.countryCode)
           )
       );
 
       setCities(uniqueResults);
     } catch (err) {
-      if (err.response?.status === 400) {
-        setCities([]);
-        setError(null);
-      } else {
+      if (err.response?.status !== 400) {
         setError("Network error. Please try again.");
       }
+      setCities([]);
     } finally {
       setLoading(false);
     }
@@ -62,23 +56,16 @@ function Home() {
         <SearchBar onSearch={handleSearch} />
 
         {loading && (
-          <p className="text-blue-600">
-            Searching destinations...
-          </p>
+          <p className="text-blue-600">Searching destinations...</p>
         )}
 
         {error && (
           <p className="text-red-500">{error}</p>
         )}
 
-        {hasSearched &&
-          !loading &&
-          cities.length === 0 &&
-          !error && (
-            <p className="text-gray-500">
-              No destinations found.
-            </p>
-          )}
+        {hasSearched && !loading && cities.length === 0 && !error && (
+          <p className="text-gray-500">No destinations found.</p>
+        )}
 
         {/* Search Results */}
         <div className="space-y-4">
@@ -119,12 +106,14 @@ function Home() {
           </div>
         )}
 
-        <Link
-  to="/dashboard"
-  className="mt-3 inline-block px-4 py-2 bg-green-600 text-white rounded-lg"
->
-  View Trip Dashboard
-</Link>
+        {selectedCity && (
+          <Link
+            to="/dashboard"
+            className="inline-block px-4 py-2 bg-green-600 text-white rounded-lg"
+          >
+            View Trip Dashboard
+          </Link>
+        )}
 
         {/* Itinerary Planner */}
         {selectedCity && (

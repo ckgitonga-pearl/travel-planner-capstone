@@ -19,8 +19,10 @@ function Dashboard() {
   }
 
   const cityKey =
-  city.id || `${city.name}-${city.address?.countryCode}`;
+  selectedCity.id ||
+  `${selectedCity.name}-${selectedCity.address?.countryCode}`;
   // 🔥 Analytics
+  const cityItinerary = itineraries[cityKey] || [];
   const totalDays = cityItinerary.length;
   const totalActivities = cityItinerary.reduce(
     (total, day) => total + day.activities.length,
@@ -104,9 +106,11 @@ function Dashboard() {
                   ) : (
                     <ul className="list-disc pl-5 mt-2">
                       {day.activities.map((activity, i) => (
-                        <li key={i}>{activity}</li>
-                      ))}
-                    </ul>
+                      <li key={i}>
+                         {activity.name} - ${activity.cost}
+                       </li>
+                   ))}
+                   </ul>
                   )}
                 </div>
               ))

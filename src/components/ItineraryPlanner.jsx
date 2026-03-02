@@ -90,24 +90,18 @@ function ItineraryPlanner({ city }) {
             <button
               onClick={() => {
   const activity = inputs[day.id];
+  const cost = costs[day.id];
 
   if (!activity || !activity.trim()) return;
 
-      addActivity(cityKey, day.id, {
-        name: activity,
-        cost: cost || 0,
-      });
+  addActivity(cityKey, day.id, {
+    name: activity,
+    cost: Number(cost) || 0,
+  });
 
-      setInputs((prev) => ({
-        ...prev,
-        [day.id]: "",
-      }));
-
-      setCosts((prev) => ({
-        ...prev,
-        [day.id]: "",
-      }));
-    }}
+  setInputs((prev) => ({ ...prev, [day.id]: "" }));
+  setCosts((prev) => ({ ...prev, [day.id]: "" }));
+}}
               className="bg-blue-600 text-white px-4 rounded"
             >
               Add
