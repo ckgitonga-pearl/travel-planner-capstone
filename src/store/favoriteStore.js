@@ -28,11 +28,19 @@ export const useFavoriteStore = create(
         }
       },
 
-      removeFavorite: (iataCode) =>
+     removeFavorite: (city) =>
   set((state) => ({
-    favorites: state.favorites.filter(
-      (city) => city.iataCode !== iataCode
-    ),
+    favorites: state.favorites.filter((fav) => {
+      const favKey =
+        fav.id ||
+        `${fav.name}-${fav.address?.countryCode}`;
+
+      const cityKey =
+        city.id ||
+        `${city.name}-${city.address?.countryCode}`;
+
+      return favKey !== cityKey;
+    }),
   })),
     }),
     {
